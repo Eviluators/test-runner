@@ -1,5 +1,5 @@
 const spawn = require('child_process').spawn;
-const Submissions = require('./schema');
+const Submission = require('./schema');
 
 const cwd = process.cwd();
 
@@ -25,11 +25,13 @@ const runTest = test => {
 
 const runner = async () => {
   try {
+    console.log('Polling the db for new submissions');
     clearInterval(poller);
-    const test = await Submissions.find()
+    const test = await Submission.find()
       .sort({ created: 1 })
-      .limit(1);
+      .limit(1)[0];
     if (!!test) {
+      console.log('Submission found, running test');
       test.status = 'running';
       /** There is a lot of room for improvement here... If the test-runner
        * service ever scales beyond a single instance, colissions will likely
@@ -40,16 +42,20 @@ const runner = async () => {
       await test.save();
       const tested = runTest(test);
       await tested.save();
+    } else {
+      console.log('No submissions found');
     }
     poller = setInterval(async () => runner(), pollerInterval);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 // IIF To start runner
 (function async() {
   try {
-    setInterval(async () => runner(), 10000);
+    setInterval(async () => runner(), pollerInterval);
   } catch (error) {
     console.log(error);
   }
-});
+})();
