@@ -1,0 +1,11 @@
+{
+  "name": "test-runner",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Eviluators/test-runner.git",
+  "author": "phytertek <ryan.phytertek@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^4.13.9"
+  }
+}
