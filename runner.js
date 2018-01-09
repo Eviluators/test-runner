@@ -1,4 +1,4 @@
-const spawn = require('child_process').spawn;
+const spawn = require('child_process').spawnSync;
 const Submission = require('./schema');
 
 const cwd = process.cwd();
@@ -6,30 +6,36 @@ const cwd = process.cwd();
 let poller;
 const pollerInterval = 10000;
 
+// new Submission({
+//   url: 'https://github.com/phytertek/Advanced-JavaScript',
+//   status: 'queued',
+//   submission_date: Date.now()
+// }).save();
+
 const runTest = test => {
-  spawn(
-    [
-      `git clone ${test.repoUrl}.git ${test._id}`,
-      `cd ${test._id}`,
-      `yarn install`,
-      `yarn test:sis`
-    ].join(' && '),
-    { shell: true }
-  );
-  const testResults = require(`${cwd}/${test._id}/testRun`);
-  spawn(`rm -rf ${cwd}/${test._id}`, { shell: true });
-  test.status = 'finished';
-  test.results = testResults;
-  return test;
+  try {
+    spawn(`git clone ${test.url}.git ${test._id}`, { shell: true });
+    spawn(`cd ${test._id} && yarn install`, { shell: true });
+    spawn(`cd ${test._id} && yarn test:sis`, { shell: true });
+    const testResults = require(`${cwd}/${test._id}/testRun`);
+    spawn(`rm -rf ${cwd}/${test._id}`, { shell: true });
+    console.log('Test complete');
+    test.status = 'finished';
+    test.result = testResults;
+    return test;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const runner = async () => {
   try {
     console.log('Polling the db for new submissions');
     clearInterval(poller);
-    const test = await Submission.find()
-      .sort({ created: 1 })
-      .limit(1)[0];
+    const query = await Submission.find({ status: 'queued' })
+      .sort({ submission_date: 1 })
+      .limit(1);
+    const test = query[0];
     if (!!test) {
       console.log('Submission found, running test');
       test.status = 'running';
@@ -45,16 +51,16 @@ const runner = async () => {
     } else {
       console.log('No submissions found');
     }
-    poller = setInterval(async () => runner(), pollerInterval);
+    poller = setInterval(() => runner(), pollerInterval);
   } catch (error) {
     console.log(error);
   }
 };
 
 // IIF To start runner
-(function async() {
+(function() {
   try {
-    setInterval(async () => runner(), pollerInterval);
+    poller = setInterval(() => runner(), pollerInterval);
   } catch (error) {
     console.log(error);
   }

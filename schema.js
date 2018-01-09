@@ -19,7 +19,7 @@ const SubmissionSchema = new mongoose.Schema({
     type: String
   },
   result: {
-    type: String
+    type: Object
   }
 });
 
