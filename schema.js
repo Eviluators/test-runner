@@ -12,6 +12,9 @@ const SubmissionSchema = new mongoose.Schema({
   submission_date: {
     type: Date
   },
+  url: {
+    type: String
+  },
   status: {
     type: String
   },
