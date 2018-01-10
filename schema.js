@@ -9,18 +9,18 @@ const options = {
 };
 
 const SubmissionSchema = new mongoose.Schema({
-  submission_date: {
-    type: Date
+  sprint: mongoose.Schema.Types.ObjectId,
+  student: {
+    type: String,
+    required: true
   },
   url: {
-    type: String
+    type: String,
+    required: true,
   },
-  status: {
-    type: String
-  },
-  result: {
-    type: Object
-  }
+  submission_date: Date,
+  status: String,
+  results: Object
 });
 
 const Submission = mongoose.model('Submission', SubmissionSchema);
