@@ -7,9 +7,7 @@ let poller;
 const pollerInterval = 10000;
 
 // new Submission({
-//   url: 'https://github.com/phytertek/Advanced-JavaScript',
-//   status: 'queued',
-//   submission_date: Date.now()
+
 // }).save();
 
 const runTest = test => {
@@ -32,20 +30,26 @@ const runner = async () => {
   try {
     console.log('Polling the db for new submissions');
     clearInterval(poller);
-    const query = await Submission.find({ status: 'queued' })
-      .sort({ submission_date: 1 })
-      .limit(1);
-    const test = query[0];
+    const test = await Submission.findOneAndUpdate(
+      {status: 'queued'},
+      {status: 'running'},
+      { sort:{ submission_date: 1 }}
+    );
+    console.log(test);
     if (!!test) {
       console.log('Submission found, running test');
-      test.status = 'running';
       /** There is a lot of room for improvement here... If the test-runner
        * service ever scales beyond a single instance, colissions will likely
        * occur when two pollers are active at the same time -- ie. both will poll the db
        * and get the same record, then they'll both try to save to that record with
        * the new status -- no bueno -- we need a mechanism for locking a record in the
        * db before it is returned as a result */
-      await test.save();
+
+      // Mongo comes with a global write lock so only one write can occur at the same time.
+      // this write lock takes precendence over a read
+      // however more than one reads can occur at the same time..
+      // so by using a findoneandupdate it should lock from any other findoneandupdate queries
+      
       const tested = runTest(test);
       await tested.save();
     } else {
