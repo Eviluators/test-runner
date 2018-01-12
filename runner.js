@@ -6,8 +6,12 @@ const cwd = process.cwd();
 let poller;
 const pollerInterval = 1000;
 
+let threadCount = 0;
+const threadMax = process.env.THREAD_MAX || 10;
+
 const runTest = test => {
   try {
+    threadCount++;
     const first = spawn(`git clone ${test.url}.git ${test._id}`, {
       shell: true
     });
@@ -28,6 +32,7 @@ const runTest = test => {
             console.log('Test complete');
             test.result = testResults;
             console.log(test);
+            threadCount--;
           });
         });
       });
@@ -39,6 +44,8 @@ const runTest = test => {
 
 const runner = async () => {
   try {
+    if (threadCount === threadMax)
+      return console.log('Waiting to finish a test before starting another');
     console.log('Polling the queue for new submissions');
     clearInterval(poller);
     const test = getNextInQueue();
