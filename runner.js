@@ -1,26 +1,37 @@
-const spawn = require('child_process').spawnSync;
-const Submission = require('./schema');
+const spawn = require('child_process').spawn;
+const { getNextInQueue } = require('./queue');
 
 const cwd = process.cwd();
 
 let poller;
-const pollerInterval = 10000;
-
-// new Submission({
-
-// }).save();
+const pollerInterval = 1000;
 
 const runTest = test => {
   try {
-    spawn(`git clone ${test.url}.git ${test._id}`, { shell: true });
-    spawn(`cd ${test._id} && yarn install`, { shell: true });
-    spawn(`cd ${test._id} && yarn test:sis`, { shell: true });
-    const testResults = require(`${cwd}/${test._id}/testRun`);
-    spawn(`rm -rf ${cwd}/${test._id}`, { shell: true });
-    console.log('Test complete');
-    test.status = 'finished';
-    test.result = testResults;
-    return test;
+    const first = spawn(`git clone ${test.url}.git ${test._id}`, {
+      shell: true
+    });
+    first.on('close', () => {
+      const second = spawn(`cd ${test._id} && yarn install`, {
+        shell: true
+      });
+      second.on('close', () => {
+        const third = spawn(`cd ${test._id} && yarn test:sis`, {
+          shell: true
+        });
+        third.on('close', () => {
+          const testResults = require(`${cwd}/${test._id}/testRun`);
+          const fourth = spawn(`rm -rf ${cwd}/${test._id}`, {
+            shell: true
+          });
+          fourth.on('close', () => {
+            console.log('Test complete');
+            test.result = testResults;
+            console.log(test);
+          });
+        });
+      });
+    });
   } catch (error) {
     console.log(error);
   }
@@ -28,30 +39,13 @@ const runTest = test => {
 
 const runner = async () => {
   try {
-    console.log('Polling the db for new submissions');
+    console.log('Polling the queue for new submissions');
     clearInterval(poller);
-    const test = await Submission.findOneAndUpdate(
-      {status: 'queued'},
-      {status: 'running'},
-      { sort:{ submission_date: 1 }}
-    );
-    console.log(test);
+    const test = getNextInQueue();
     if (!!test) {
       console.log('Submission found, running test');
-      /** There is a lot of room for improvement here... If the test-runner
-       * service ever scales beyond a single instance, colissions will likely
-       * occur when two pollers are active at the same time -- ie. both will poll the db
-       * and get the same record, then they'll both try to save to that record with
-       * the new status -- no bueno -- we need a mechanism for locking a record in the
-       * db before it is returned as a result */
 
-      // Mongo comes with a global write lock so only one write can occur at the same time.
-      // this write lock takes precendence over a read
-      // however more than one reads can occur at the same time..
-      // so by using a findoneandupdate it should lock from any other findoneandupdate queries
-      
       const tested = runTest(test);
-      await tested.save();
     } else {
       console.log('No submissions found');
     }
