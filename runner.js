@@ -55,6 +55,7 @@ const runner = () => {
       return console.log('Waiting to finish a test before starting another');
     console.log('Polling the queue for new submissions');
     clearInterval(poller);
+    console.log(store.getQueue());
     const test = store.nextFromQueue();
     if (!!test) {
       console.log('Submission found, running test');

@@ -76,6 +76,7 @@ const action = {
     const runTimeLog = state.runTimeLog.spawn;
     setState({ queue, runTimeLog });
   },
+  getQueue: () => state.queue.clone,
   addToQueue: item => {
     const queue = state.queue.clone;
     queue.add(item);
