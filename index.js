@@ -29,7 +29,7 @@ server.post('/new-test', async (req, res) => {
     if (req.body.action === 'opened') {
       console.log('One');
       const { pull_request } = req.body;
-      console.log('two');
+      console.log('two', pull_request.user.login);
       const student = await getStudent(pull_request.user.login);
       console.log('three');
       const testSubmission = {
