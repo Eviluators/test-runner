@@ -51,7 +51,9 @@ server.post('/new-test', async (req, res) => {
   }
 });
 
-server.listen(process.env.PORT || 3434, error => {
+const PORT = process.env.PORT || 3434;
+const HOST = process.env.HOST || '0.0.0.0';
+server.listen(PORT, HOST, error => {
   if (error) return console.log(error);
-  console.log(`Test-runner api running on port ${process.env.PORT || 3434}`);
+  console.log(`Test-runner api running on http://${HOST}:${PORT}`);
 });

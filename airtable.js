@@ -21,6 +21,7 @@ const actions = {
   },
   newTestResult: async fields => {
     try {
+      console.log(fields);
       const testResult = await Test_Result.create(fields || {});
       return testResult;
     } catch (error) {

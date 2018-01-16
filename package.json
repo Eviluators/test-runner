@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/Eviluators/test-runner.git",
-  "author": "phytertek <ryan.phytertek@gmail.com>",
+  "author": "eviluators",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "airtable": "^0.5.2",
-    "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
     "express": "^4.16.2",

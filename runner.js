@@ -15,33 +15,46 @@ const runTest = test => {
     console.log('Starting Test');
     console.log(cwd);
     const first = spawn(
-      `git clone ${test['PR Url']}.git ${test['Student ID']}`,
+      `git clone ${test['PR Url']}.git ${test['Student ID']}${startTime}`,
       {
         shell: true
       }
     );
     first.on('close', () => {
       console.log('Finished Clone');
-      const second = spawn(`cd ${test['Student ID']} && yarn install`, {
-        shell: true
-      });
+      const second = spawn(
+        `cd ${test['Student ID']}${startTime} && yarn install`,
+        {
+          shell: true
+        }
+      );
       second.on('close', () => {
         console.log('Finished Install');
-        const third = spawn(`cd ${test['Student ID']} && yarn test:sis`, {
-          shell: true
-        });
+        const third = spawn(
+          `cd ${test['Student ID']}${startTime} && yarn test:sis`,
+          {
+            shell: true
+          }
+        );
         third.on('close', () => {
           console.log('Finished Test Run');
           console.log(`${cwd}/${test['Student ID']}/testRun`);
-          const testResults = require(`${cwd}/${test['Student ID']}/testRun`);
-          const fourth = spawn(`rm -rf ${cwd}/${test['Student ID']}`, {
-            shell: true
-          });
+          const testResults = require(`${cwd}/${
+            test['Student ID']
+          }${startTime}/testRun`);
+          const fourth = spawn(
+            `rm -rf ${cwd}/${test['Student ID']}${startTime}`,
+            {
+              shell: true
+            }
+          );
           fourth.on('close', () => {
             console.log('Writing Results');
-            test['Results'] = testResults;
-            test['Pass'] = !!testResults.numFailedTests;
             const runTime = Date.now() - startTime;
+            test['Results'] = JSON.stringify(testResults);
+            test['Pass'] = testResults.numFailedTests === 0;
+            test['Student ID'] = [`${test['Student ID']}`];
+            test['Run Time'] = runTime;
             threadCount--;
             store.setRunTimeLog(runTime);
             console.log('In tuner mode?', store.inTuneMode());
