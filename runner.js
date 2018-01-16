@@ -12,6 +12,7 @@ const runTest = test => {
   try {
     threadCount++;
     const startTime = Date.now();
+    console.log('Starting Test');
     const first = spawn(
       `git clone ${test['PR Url']}.git ${test['Student ID']}`,
       {
@@ -19,19 +20,23 @@ const runTest = test => {
       }
     );
     first.on('close', () => {
+      console.log('Finished Clone');
       const second = spawn(`cd ${test['Student ID']} && yarn install`, {
         shell: true
       });
       second.on('close', () => {
+        console.log('Finished Install');
         const third = spawn(`cd ${test['Student ID']} && yarn test:sis`, {
           shell: true
         });
         third.on('close', () => {
+          console.log('Finished Test Run');
           const testResults = require(`${cwd}/${test['Student ID']}/testRun`);
           const fourth = spawn(`rm -rf ${cwd}/${test['Student ID']}`, {
             shell: true
           });
           fourth.on('close', () => {
+            console.log('Writing Results');
             test['Results'] = testResults;
             test['Pass'] = !!testResults.numFailedTests;
             const runTime = Date.now() - startTime;
