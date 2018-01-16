@@ -27,8 +27,11 @@ server.post('/new-test', async (req, res) => {
   try {
     console.log(req.body.action === 'opened');
     if (req.body.action === 'opened') {
+      console.log('One');
       const { pull_request } = req.body;
+      console.log('two');
       const student = await getStudent(pull_request.user.login);
+      console.log('three');
       const testSubmission = {
         'Student ID': student.id,
         'PR Url': pull_request.head.repo.html_url,
