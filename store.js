@@ -35,7 +35,7 @@ class State {
     this.runTimeAvg = state.runTimeAvg || '';
     this.tuneMode = state.tuneMode || false;
     this.tuneData = state.tuneData || {
-      testsToRun: 5,
+      testsToRun: 10,
       bestRunTimeAvg: '',
       bestRunTimeTotal: '',
       bestInterval: 3000,
@@ -62,13 +62,13 @@ const setState = updatedState => {
 };
 
 const action = {
-  inTunerMode: () => stata.tuneMode,
+  inTuneMode: () => state.tuneMode,
   getBestRunTime: () => state.tuneData.bestRunTimeTotal,
   getRunTimeAvg: () => state.runTimeAvg,
   runTimeLogLength: () => state.runTimeLog.length,
   getBestRunTimeAvg: () => state.tuneData.bestRunTimeAvg,
-  tunerOn: () => setState({ tunerMode: true }),
-  tunerOff: () => setState({ tunerMode: false }),
+  tunerOn: () => setState({ tuneMode: true }),
+  tunerOff: () => setState({ tuneMode: false }),
   getTunerTestCount: () => state.tuneData.testsToRun,
   getInterval: () => state.interval,
   getMaxThreadCount: () => state.maxThreadCount,

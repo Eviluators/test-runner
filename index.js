@@ -30,7 +30,7 @@ server.post('/new-test', async (req, res) => {
       console.log('One');
       const { pull_request } = req.body;
       console.log('two', pull_request.user.login);
-      // const student = await getStudent(pull_request.user.login);
+      const student = await getStudent(pull_request.user.login);
       console.log('three');
       const testSubmission = {
         // 'Student ID': student.id,
@@ -39,7 +39,7 @@ server.post('/new-test', async (req, res) => {
         'Repository Name': pull_request.head.repo.name
       };
       console.log('*** TEST SUBMISSION ***', testSubmission);
-      if (store.inTunerMode()) {
+      if (store.inTuneMode()) {
         store.addToBackupQueue(testSubmission);
       } else {
         store.addToQueue(testSubmission);
@@ -51,7 +51,7 @@ server.post('/new-test', async (req, res) => {
   }
 });
 
-server.listen(process.env.PORT, error => {
+server.listen(process.env.PORT || 3434, error => {
   if (error) return console.log(error);
-  console.log(`Test-runner api running on port ${process.env.PORT}`);
+  console.log(`Test-runner api running on port ${process.env.PORT || 3434}`);
 });

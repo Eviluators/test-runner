@@ -21,10 +21,12 @@ const actions = {
   },
   newTestResult: async fields => {
     try {
-      const testResult = await Test_Results.create(fields || {});
+      const testResult = await Test_Result.create(fields || {});
       return testResult;
     } catch (error) {
       throw new Error(error);
     }
   }
 };
+
+module.exports = actions;

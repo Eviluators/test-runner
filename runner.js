@@ -35,10 +35,12 @@ const runTest = test => {
             test['Results'] = testResults;
             test['Pass'] = !!testResults.numFailedTests;
             const runTime = Date.now() - startTime;
-            console.log('Test Finished', runTime);
             threadCount--;
             store.setRunTimeLog(runTime);
-            newTestResult(test);
+            console.log('In tuner mode?', store.inTuneMode());
+            if (!store.inTuneMode()) {
+              newTestResult(test);
+            }
           });
         });
       });
@@ -51,17 +53,16 @@ const runTest = test => {
 const runner = () => {
   try {
     const maxThreads = store.getMaxThreadCount();
-    if (threadCount >= maxThreads)
-      return console.log('Waiting to finish a test before starting another');
-    console.log('Polling the queue for new submissions');
+    if (threadCount >= maxThreads) return; //console.log('Waiting to finish a test before starting another');
+    // console.log('Polling the queue for new submissions');
     clearInterval(poller);
-    console.log(store.getQueue());
     const test = store.nextFromQueue();
     if (!!test) {
-      console.log('Submission found, running test');
-      runTest(test);
+      // console.log('Submission found, running test');
+      const tested = runTest(test);
+      // Return test results to Airtable
     } else {
-      console.log('No submissions found');
+      // console.log('No submissions found');
     }
     poller = setInterval(() => runner(), store.getInterval());
   } catch (error) {
