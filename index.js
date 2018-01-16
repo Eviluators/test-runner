@@ -33,6 +33,7 @@ server.post('/new-test', async (req, res) => {
         'PR Url': pull_request.head.repo.html_url,
         'Repository Name': pull_request.head.repo.name
       };
+      console.log('*** TEST SUBMISSION ***', testSubmission);
       if (store.inTunerMode()) {
         store.addToBackupQueue(testSubmission);
       } else {
