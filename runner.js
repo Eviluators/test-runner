@@ -35,6 +35,7 @@ const runTest = test => {
             test['Results'] = testResults;
             test['Pass'] = !!testResults.numFailedTests;
             const runTime = Date.now() - startTime;
+            console.log('Test Finished', runTime);
             threadCount--;
             store.setRunTimeLog(runTime);
             newTestResult(test);
@@ -55,9 +56,8 @@ const runner = () => {
     clearInterval(poller);
     const test = store.nextFromQueue();
     if (!!test) {
-      // console.log('Submission found, running test');
-      const tested = runTest(test);
-      // Return test results to Airtable
+      console.log('Submission found, running test');
+      runTest(test);
     } else {
       // console.log('No submissions found');
     }
