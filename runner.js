@@ -13,6 +13,7 @@ const runTest = test => {
     threadCount++;
     const startTime = Date.now();
     console.log('Starting Test');
+    console.log(cwd);
     const first = spawn(
       `git clone ${test['PR Url']}.git ${test['Student ID']}`,
       {
@@ -31,6 +32,7 @@ const runTest = test => {
         });
         third.on('close', () => {
           console.log('Finished Test Run');
+          console.log(`${cwd}/${test['Student ID']}/testRun`);
           const testResults = require(`${cwd}/${test['Student ID']}/testRun`);
           const fourth = spawn(`rm -rf ${cwd}/${test['Student ID']}`, {
             shell: true
