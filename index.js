@@ -7,9 +7,9 @@ const startTuner = require('./tune');
 const { getStudent } = require('./airtable');
 require('./runner');
 
-server.use(bodyParser.json());
 server.use(cors());
 server.use(helmet());
+server.use(bodyParser.json());
 
 server.post('/start-tune', async (req, res) => {
   try {
@@ -25,6 +25,7 @@ server.post('/start-tune', async (req, res) => {
 
 server.post('/new-test', async (req, res) => {
   try {
+    console.log(req.body);
     if (req.body.action === 'opened') {
       const { pull_request } = req.body;
       const student = await getStudent(pull_request.user.login);
@@ -40,7 +41,7 @@ server.post('/new-test', async (req, res) => {
         store.addToQueue(testSubmission);
       }
     }
-    res.sendStatus(200);
+    res.json(req.body);
   } catch (error) {
     res.json(error);
   }
