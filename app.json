@@ -1,0 +1,6 @@
+{
+  "name": "eviluators-test-runner",
+  "description": "Eviluators Test Runner",
+  "repository": "https://github.com/Eviluators/test-runner",
+  "image": "heroku/nodejs"
+}
