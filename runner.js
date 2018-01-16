@@ -1,38 +1,43 @@
 const spawn = require('child_process').spawn;
-const { getNextInQueue } = require('./queue');
+const store = require('./store');
+const { newTestResult } = require('./airtable');
 
 const cwd = process.cwd();
 
 let poller;
-const pollerInterval = 1000;
 
 let threadCount = 0;
-const threadMax = process.env.THREAD_MAX || 10;
 
 const runTest = test => {
   try {
     threadCount++;
-    const first = spawn(`git clone ${test.url}.git ${test._id}`, {
-      shell: true
-    });
+    const startTime = Date.now();
+    const first = spawn(
+      `git clone ${test['PR Url']}.git ${test['Student ID']}`,
+      {
+        shell: true
+      }
+    );
     first.on('close', () => {
-      const second = spawn(`cd ${test._id} && yarn install`, {
+      const second = spawn(`cd ${test['Student ID']} && yarn install`, {
         shell: true
       });
       second.on('close', () => {
-        const third = spawn(`cd ${test._id} && yarn test:sis`, {
+        const third = spawn(`cd ${test['Student ID']} && yarn test:sis`, {
           shell: true
         });
         third.on('close', () => {
-          const testResults = require(`${cwd}/${test._id}/testRun`);
-          const fourth = spawn(`rm -rf ${cwd}/${test._id}`, {
+          const testResults = require(`${cwd}/${test['Student ID']}/testRun`);
+          const fourth = spawn(`rm -rf ${cwd}/${test['Student ID']}`, {
             shell: true
           });
           fourth.on('close', () => {
-            console.log('Test complete');
-            test.result = testResults;
-            console.log(test);
+            test['Results'] = testResults;
+            test['Pass'] = !!testResults.numFailedTests;
+            const runTime = Date.now() - startTime;
             threadCount--;
+            store.setRunTimeLog(runTime);
+            newTestResult(test);
           });
         });
       });
@@ -42,21 +47,21 @@ const runTest = test => {
   }
 };
 
-const runner = async () => {
+const runner = () => {
   try {
-    if (threadCount === threadMax)
-      return console.log('Waiting to finish a test before starting another');
-    console.log('Polling the queue for new submissions');
+    const maxThreads = store.getMaxThreadCount();
+    if (threadCount >= maxThreads) return; //console.log('Waiting to finish a test before starting another');
+    // console.log('Polling the queue for new submissions');
     clearInterval(poller);
-    const test = getNextInQueue();
+    const test = store.nextFromQueue();
     if (!!test) {
-      console.log('Submission found, running test');
-
+      // console.log('Submission found, running test');
       const tested = runTest(test);
+      // Return test results to Airtable
     } else {
-      console.log('No submissions found');
+      // console.log('No submissions found');
     }
-    poller = setInterval(() => runner(), pollerInterval);
+    poller = setInterval(() => runner(), store.getInterval());
   } catch (error) {
     console.log(error);
   }
@@ -65,7 +70,7 @@ const runner = async () => {
 // IIF To start runner
 (function() {
   try {
-    poller = setInterval(() => runner(), pollerInterval);
+    poller = setInterval(() => runner(), store.getInterval());
   } catch (error) {
     console.log(error);
   }
