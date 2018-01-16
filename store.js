@@ -62,6 +62,7 @@ const setState = updatedState => {
 };
 
 const action = {
+  inTunerMode: () => stata.tuneMode,
   getBestRunTime: () => state.tuneData.bestRunTimeTotal,
   getRunTimeAvg: () => state.runTimeAvg,
   runTimeLogLength: () => state.runTimeLog.length,
