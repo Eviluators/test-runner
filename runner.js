@@ -51,15 +51,16 @@ const runTest = test => {
 const runner = () => {
   try {
     const maxThreads = store.getMaxThreadCount();
-    if (threadCount >= maxThreads) return; //console.log('Waiting to finish a test before starting another');
-    // console.log('Polling the queue for new submissions');
+    if (threadCount >= maxThreads)
+      return console.log('Waiting to finish a test before starting another');
+    console.log('Polling the queue for new submissions');
     clearInterval(poller);
     const test = store.nextFromQueue();
     if (!!test) {
       console.log('Submission found, running test');
       runTest(test);
     } else {
-      // console.log('No submissions found');
+      console.log('No submissions found');
     }
     poller = setInterval(() => runner(), store.getInterval());
   } catch (error) {
