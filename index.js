@@ -25,7 +25,7 @@ server.post('/start-tune', async (req, res) => {
 
 server.post('/new-test', async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body.action === 'opened');
     if (req.body.action === 'opened') {
       const { pull_request } = req.body;
       const student = await getStudent(pull_request.user.login);
