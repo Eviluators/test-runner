@@ -6,7 +6,8 @@
   "author": "eviluators",
   "license": "MIT",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "push:heroku": "sudo heroku container:push web"
   },
   "dependencies": {
     "airtable": "^0.5.2",

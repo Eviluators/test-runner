@@ -33,8 +33,7 @@ server.post('/new-test', async (req, res) => {
       const student = await getStudent(pull_request.user.login);
       console.log('three');
       const testSubmission = {
-        // 'Student ID': student.id,
-        'Student ID': 'reccRTg1C2iQH6Cg8',
+        'Student ID': student.id,
         'PR Url': pull_request.head.repo.html_url,
         'Repository Name': pull_request.head.repo.name
       };
