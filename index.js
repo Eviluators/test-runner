@@ -5,9 +5,10 @@ const helmet = require('helmet');
 const store = require('./store');
 const startTuner = require('./tune');
 const { getStudent } = require('./airtable');
+const { corsOptions } = require('./cors');
 require('./runner');
 
-server.use(cors());
+server.use(cors(corsOptions));
 server.use(helmet());
 server.use(bodyParser.json());
 
