@@ -12,6 +12,10 @@ server.use(cors(corsOptions));
 server.use(helmet());
 server.use(bodyParser.json());
 
+server.get('/', cors(corsOptions), (req, res) => {
+  res.json({ msg: 'CORS-enabled for whitelisted domains' });
+});
+
 server.post('/start-tune', async (req, res) => {
   try {
     const { auth } = req.body;
