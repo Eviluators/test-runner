@@ -29,7 +29,7 @@ class State {
     this.queue = state.queue || new Queue();
     this.backupQueue = state.backupQueue || new Queue();
     this.interval = state.interval || 3000;
-    this.maxThreadCount = state.maxThreadCount || 1;
+    this.maxThreadCount = state.maxThreadCount || 7;
     this.runTimeLog = state.runTimeLog || new Queue();
     this.backupRunTimeLog = state.backupRunTimeLog || new Queue();
     this.runTimeAvg = state.runTimeAvg || '';
@@ -39,7 +39,7 @@ class State {
       bestRunTimeAvg: '',
       bestRunTimeTotal: '',
       bestInterval: 3000,
-      bestMaxThreadCount: 1
+      bestMaxThreadCount: 4
     };
   }
   get clone() {

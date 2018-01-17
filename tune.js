@@ -41,12 +41,14 @@ const increaseMaxThreadCount = next => {
     if (store.runTimeLogLength() === store.getTunerTestCount()) {
       const runTime = Date.now() - startTime;
       clearInterval(queuePoller);
-      if (runTime > store.getBestRunTime()) {
-        store.logBestTune();
+      if (runTime < store.getBestRunTime()) {
+        store.logBestTune(runTime);
         console.log(`*** Total Run Time:  ${runTime}`);
         increaseMaxThreadCount(next);
       } else {
-        store.setBestTune();
+        store.setBestTune(runTime);
+        console.log(`*** This Total Run Time:  ${runTime}ms`);
+        console.log(`*** This Run Time Avg:  ${runTime / 10}ms`);
         console.log('*****************************');
         console.log('*** Max Thread Count ***');
         console.log(`*** Total Run Time:  ${store.getBestRunTime()}`);
@@ -73,12 +75,14 @@ const increaseInterval = next => {
     if (store.runTimeLogLength() === store.getTunerTestCount()) {
       const runTime = Date.now() - startTime;
       clearInterval(queuePoller);
-      if (runTime > store.getBestRunTime()) {
-        store.logBestTune();
+      if (runTime < store.getBestRunTime()) {
+        store.logBestTune(runTime);
         console.log(`*** Total Run Time:  ${runTime}`);
         increaseInterval(next);
       } else {
-        store.setBestTune();
+        store.setBestTune(runTime);
+        console.log(`*** This Total Run Time:  ${runTime}ms`);
+        console.log(`*** This Run Time Avg:  ${runTime / 10}ms`);
         console.log('*****************************');
         console.log('*** Max Interval ***');
         console.log(`*** Total Run Time:  ${store.getBestRunTime()}`);
@@ -104,12 +108,14 @@ const decreaseMaxThreadCount = next => {
     if (store.runTimeLogLength() === store.getTunerTestCount()) {
       const runTime = Date.now() - startTime;
       clearInterval(queuePoller);
-      if (runTime > store.getBestRunTime()) {
-        store.logBestTune();
+      if (runTime < store.getBestRunTime()) {
+        store.logBestTune(runTime);
         console.log(`*** Total Run Time:  ${runTime}`);
         decreaseMaxThreadCount(next);
       } else {
-        store.setBestTune();
+        store.setBestTune(runTime);
+        console.log(`*** This Total Run Time:  ${runTime}ms`);
+        console.log(`*** This Run Time Avg:  ${runTime / 10}ms`);
         console.log('*****************************');
         console.log('*** Min Thread Count ***');
         console.log(`*** Total Run Time:  ${store.getBestRunTime()}`);
@@ -135,12 +141,14 @@ const decreaseInterval = next => {
     if (store.runTimeLogLength() === store.getTunerTestCount()) {
       const runTime = Date.now() - startTime;
       clearInterval(queuePoller);
-      if (runTime > store.getBestRunTime() || store.getInterval <= 0) {
-        store.logBestTune();
+      if (runTime < store.getBestRunTime() || store.getInterval <= 0) {
+        store.logBestTune(runTime);
         console.log(`*** Total Run Time:  ${runTime}`);
         decreaseInterval(next);
       } else {
-        store.setBestTune();
+        store.setBestTune(runTime);
+        console.log(`*** This Total Run Time:  ${runTime}ms`);
+        console.log(`*** This Run Time Avg:  ${runTime / 10}ms`);
         console.log('*****************************');
         console.log('*** Min Interval ***');
         console.log(`*** Total Run Time:  ${store.getBestRunTime()}`);
@@ -166,6 +174,7 @@ const startTuner = () => {
   store.tunerOn();
   firstRun(() => tuneSequence());
 };
+
 // Finish Tune
 const finishTune = () => {
   console.log('*****************************');

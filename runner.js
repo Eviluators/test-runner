@@ -12,8 +12,6 @@ const runTest = test => {
   try {
     threadCount++;
     const startTime = Date.now();
-    console.log('Starting Test');
-    console.log(cwd);
     const first = spawn(
       `git clone ${test['PR Url']}.git ${test['Student ID']}${startTime}`,
       {
@@ -21,7 +19,6 @@ const runTest = test => {
       }
     );
     first.on('close', () => {
-      console.log('Finished Clone');
       const second = spawn(
         `cd ${test['Student ID']}${startTime} && yarn install`,
         {
@@ -29,7 +26,6 @@ const runTest = test => {
         }
       );
       second.on('close', () => {
-        console.log('Finished Install');
         const third = spawn(
           `cd ${test['Student ID']}${startTime} && yarn test:sis`,
           {
@@ -37,8 +33,6 @@ const runTest = test => {
           }
         );
         third.on('close', () => {
-          console.log('Finished Test Run');
-          console.log(`${cwd}/${test['Student ID']}/testRun`);
           const testResults = require(`${cwd}/${
             test['Student ID']
           }${startTime}/testRun`);
@@ -49,15 +43,14 @@ const runTest = test => {
             }
           );
           fourth.on('close', () => {
-            console.log('Writing Results');
             const runTime = Date.now() - startTime;
             test['Results'] = JSON.stringify(testResults);
             test['Pass'] = testResults.numFailedTests === 0;
             test['Student ID'] = [`${test['Student ID']}`];
             test['Run Time'] = runTime;
             threadCount--;
+            console.log(`Test Finished in: ${runTime}ms`);
             store.setRunTimeLog(runTime);
-            console.log('In tuner mode?', store.inTuneMode());
             if (!store.inTuneMode()) {
               newTestResult(test);
             }
