@@ -5,24 +5,45 @@ const helmet = require('helmet');
 const store = require('./store');
 const startTuner = require('./tune');
 const { getStudent } = require('./airtable');
-const { corsOptions } = require('./cors');
 require('./runner');
 
-server.use(cors(corsOptions));
+server.use(cors());
 server.use(helmet());
 server.use(bodyParser.json());
 
-server.get('/', cors(corsOptions), (req, res) => {
-  res.json({ msg: 'CORS-enabled for whitelisted domains' });
+// might be worth separating this into it's own file
+const checkGitHub = (req) => {
+  if (!req.headers['user-agent'].includes('GitHub-Hookshot')) {
+    return false;
+  }
+  const theirSignature = req.headers['x-hub-signature'];
+  const payload = JSON.stringify(req.body);
+  const secret = process.env.GITHUB_SECRET_TOKEN;
+  const ourSignature = `sha1=${crypto.createHmac('sha1', secret).update(payload).digest('hex')}`;
+  return crypto.timingSafeEqual(Buffer.from(theirSignature), Buffer.from(ourSignature));
+};
+
+const notAuthorized = (req, res) => {
+  console.log("Request from non-GitHub webhook. Redirecting.");
+  res.redirect(301, '/');
+}
+
+server.get('/', (req, res) => {
+  res.json({ msg: 'Github webhooks only' });
 });
 
 server.post('/start-tune', async (req, res) => {
   try {
-    const { auth } = req.body;
-    if (auth === process.env.TUNER_AUTH) {
-      startTuner();
+    if (checkGitHub(req)) {
+      console.log("Request from GitHub webhook verified.")
+      const { auth } = req.body;
+      if (auth === process.env.TUNER_AUTH) {
+        startTuner();
+      }
+      res.sendStatus(200);
+    } else {
+      notAuthorized(req, res);
     }
-    res.sendStatus(200);
   } catch (error) {
     res.json(error);
   }
@@ -30,26 +51,31 @@ server.post('/start-tune', async (req, res) => {
 
 server.post('/new-test', async (req, res) => {
   try {
-    console.log(req.body.action === 'opened');
-    if (req.body.action === 'opened') {
-      console.log('One');
-      const { pull_request } = req.body;
-      console.log('two', pull_request.user.login);
-      const student = await getStudent(pull_request.user.login);
-      console.log('three');
-      const testSubmission = {
-        'Student ID': student.id,
-        'PR Url': pull_request.head.repo.html_url,
-        'Repository Name': pull_request.head.repo.name
-      };
-      console.log('*** TEST SUBMISSION ***', testSubmission);
-      if (store.inTuneMode()) {
-        store.addToBackupQueue(testSubmission);
-      } else {
-        store.addToQueue(testSubmission);
+    if (checkGitHub(req)) {
+      console.log("Request from GitHub webhook verified.")
+      console.log(req.body.action === 'opened');
+      if (req.body.action === 'opened') {
+        console.log('One');
+        const { pull_request } = req.body;
+        console.log('two', pull_request.user.login);
+        const student = await getStudent(pull_request.user.login);
+        console.log('three');
+        const testSubmission = {
+          'Student ID': student.id,
+          'PR Url': pull_request.head.repo.html_url,
+          'Repository Name': pull_request.head.repo.name
+        };
+        console.log('*** TEST SUBMISSION ***', testSubmission);
+        if (store.inTuneMode()) {
+          store.addToBackupQueue(testSubmission);
+        } else {
+          store.addToQueue(testSubmission);
+        }
       }
+      res.json(req.body);
+    } else {
+      notAuthorized(req, res);
     }
-    res.json(req.body);
   } catch (error) {
     res.json(error);
   }
