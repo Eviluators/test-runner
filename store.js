@@ -28,18 +28,18 @@ class State {
   constructor(state = {}) {
     this.queue = state.queue || new Queue();
     this.backupQueue = state.backupQueue || new Queue();
-    this.interval = state.interval || 3000;
-    this.maxThreadCount = state.maxThreadCount || 7;
+    this.interval = state.interval || 0;
+    this.maxThreadCount = state.maxThreadCount || 1;
     this.runTimeLog = state.runTimeLog || new Queue();
     this.backupRunTimeLog = state.backupRunTimeLog || new Queue();
     this.runTimeAvg = state.runTimeAvg || '';
     this.tuneMode = state.tuneMode || false;
     this.tuneData = state.tuneData || {
-      testsToRun: 10,
+      testsToRun: 15,
       bestRunTimeAvg: '',
       bestRunTimeTotal: '',
-      bestInterval: 3000,
-      bestMaxThreadCount: 4
+      bestInterval: 0,
+      bestMaxThreadCount: 1
     };
   }
   get clone() {
@@ -53,6 +53,9 @@ class State {
     };
     return new State(clonedState);
   }
+  get tuneDataClone() {
+    return { ...this.tuneData };
+  }
 }
 
 let state = new State();
@@ -62,6 +65,8 @@ const setState = updatedState => {
 };
 
 const action = {
+  setTestsToRun: count =>
+    setState({ tuneData: { ...state.tuneDataClone, testsToRun: count } }),
   inTuneMode: () => state.tuneMode,
   getBestRunTime: () => state.tuneData.bestRunTimeTotal,
   getRunTimeAvg: () => state.runTimeAvg,
@@ -96,7 +101,7 @@ const action = {
   },
   backupQueues: () => {
     const backupQueue = state.queue.clone;
-    const backupRunTimeLog = state.backupRunTimeLog.clone;
+    const backupRunTimeLog = state.runTimeLog.clone;
     const queue = state.queue.spawn;
     const runTimeLog = state.runTimeLog.spawn;
     setState({ backupQueue, backupRunTimeLog, queue, runTimeLog });
@@ -116,6 +121,10 @@ const action = {
   incMaxThreadCount: () => {
     let maxThreadCount = state.maxThreadCount;
     maxThreadCount++;
+    const tuneData = state.tuneDataClone;
+    if (maxThreadCount >= tuneData.testsToRun) {
+      tuneData.testsToRun *= 2;
+    }
     setState({ maxThreadCount });
   },
   incInterval: () => {
@@ -130,7 +139,7 @@ const action = {
   },
   decInterval: () => {
     let interval = state.interval;
-    interval -= 500;
+    if (interval > 0) interval -= 500;
     setState({ interval });
   },
   logBestTune: time => {
