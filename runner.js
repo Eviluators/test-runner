@@ -6,11 +6,12 @@ const cwd = process.cwd();
 let poller;
 const pollerInterval = 1000;
 
-const runTest = test => {
+const runTest = (test, cb) => {
   try {
     const first = spawn(`git clone ${test.url}.git ${test._id}`, {
       shell: true
     });
+    if (cb) return cb({ ...test, first }); // needed for git test to exit
     first.on('close', () => {
       const second = spawn(`cd ${test._id} && yarn install`, {
         shell: true
@@ -63,3 +64,7 @@ const runner = async () => {
     console.log(error);
   }
 })();
+
+module.exports = {
+  runTest
+}
