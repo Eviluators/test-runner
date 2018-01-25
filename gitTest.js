@@ -25,7 +25,7 @@ const gitTest = new Promise((resolve, reject) => {
   first.on('close', function() {
   path = `${process.cwd()}/${cb.args[0][0]._id}/`;
   exists = fs.existsSync(path);
-  resolve(true);
+  resolve(exists);
   })
 });
 
