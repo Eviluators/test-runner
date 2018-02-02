@@ -1,4 +1,5 @@
 const server = require('express')();
+const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -13,12 +14,14 @@ server.use(bodyParser.json());
 
 // might be worth separating this into it's own file
 const checkGitHub = req => {
+  console.log('Checking for headers');
+  console.log(req.headers['user-agent'].includes('GitHub-Hookshot'));
   if (!req.headers['user-agent'].includes('GitHub-Hookshot')) {
     return false;
   }
   const theirSignature = req.headers['x-hub-signature'];
   const payload = JSON.stringify(req.body);
-  const secret = process.env.GITHUB_SECRET_TOKEN;
+  const secret = 'AKZoLGKhDfOZvKuV'; //process.env.GITHUB_SECRET_TOKEN ||
   const ourSignature = `sha1=${crypto
     .createHmac('sha1', secret)
     .update(payload)
@@ -52,6 +55,7 @@ server.get('/start-tune', async (req, res) => {
 
 server.post('/new-test', async (req, res) => {
   try {
+    console.log('Is This Thing on??');
     if (checkGitHub(req)) {
       console.log('Request from GitHub webhook verified.');
       console.log(req.body.action === 'opened');

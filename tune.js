@@ -180,7 +180,7 @@ const finishTune = () => {
   console.log('*****************************');
   console.log('*****************************');
   console.log(
-    iterations < 5 ? `*** Finished ${iterations} iteration` : '***Final***'
+    iterations < 1 ? `*** Finished ${iterations} iteration` : '***Final***'
   );
   console.log('*****************************');
   console.log('*****************************');
@@ -189,7 +189,7 @@ const finishTune = () => {
   console.log(`*** Optimal Run Time Avg: ${store.getBestRunTimeAvg()}`);
   console.log('*****************************');
   console.log('*****************************');
-  if (iterations === 5) {
+  if (iterations === 1) {
     iterations = 0;
     store.restoreQueues();
     store.tunerOff();

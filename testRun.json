@@ -1,0 +1,32 @@
+{
+  "stats": {
+    "suites": 2,
+    "tests": 1,
+    "passes": 1,
+    "pending": 0,
+    "failures": 0,
+    "start": "2018-01-26T17:39:46.376Z",
+    "end": "2018-01-26T17:39:46.384Z",
+    "duration": 8
+  },
+  "tests": [
+    {
+      "title": "should clone the repository",
+      "fullTitle": "runTest git should clone the repository",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [],
+  "passes": [
+    {
+      "title": "should clone the repository",
+      "fullTitle": "runTest git should clone the repository",
+      "duration": 1,
+      "currentRetry": 0,
+      "err": {}
+    }
+  ]
+}

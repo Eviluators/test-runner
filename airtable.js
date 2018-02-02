@@ -1,5 +1,5 @@
 const Airtable = require('airtable');
-
+const mockActions = require('./airtableMockORM');
 const apiKey = process.env.AIRTABLE_API_KEY || 'keysRGO1v32tbkj2X';
 const root = process.env.AIRTABLE_ROOT || 'appUqpw2k7cfrkkC8';
 
@@ -21,7 +21,6 @@ const actions = {
   },
   newTestResult: async fields => {
     try {
-      console.log(fields);
       const testResult = await Test_Result.create(fields || {});
       return testResult;
     } catch (error) {
@@ -30,4 +29,4 @@ const actions = {
   }
 };
 
-module.exports = actions;
+module.exports = process.env.TEST !== 'test' ? actions : mockActions;

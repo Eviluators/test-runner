@@ -29,13 +29,13 @@ class State {
     this.queue = state.queue || new Queue();
     this.backupQueue = state.backupQueue || new Queue();
     this.interval = state.interval || 3000;
-    this.maxThreadCount = state.maxThreadCount || 7;
+    this.maxThreadCount = state.maxThreadCount || 4;
     this.runTimeLog = state.runTimeLog || new Queue();
     this.backupRunTimeLog = state.backupRunTimeLog || new Queue();
     this.runTimeAvg = state.runTimeAvg || '';
     this.tuneMode = state.tuneMode || false;
     this.tuneData = state.tuneData || {
-      testsToRun: 10,
+      testsToRun: 5,
       bestRunTimeAvg: '',
       bestRunTimeTotal: '',
       bestInterval: 3000,
