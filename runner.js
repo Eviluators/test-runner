@@ -8,7 +8,7 @@ let poller;
 
 let threadCount = 0;
 
-const runTest = test => {
+const runTest = (test, cb) => {
   try {
     threadCount++;
     const startTime = Date.now();
@@ -18,6 +18,7 @@ const runTest = test => {
         shell: true
       }
     );
+    if (cb) return cb({ ...test, first }); // needed for git test to exit
     first.on('close', () => {
       const second = spawn(
         `cd ${test['Student ID']}${startTime} && yarn install`,
@@ -44,8 +45,17 @@ const runTest = test => {
           );
           fourth.on('close', () => {
             const runTime = Date.now() - startTime;
+            // Determine if tests are from Mocha or Jest
+            if (testResults.hasOwnProperty('numFailedTests')) {
+              // Jest
+              test['Test Suite'] = 'Jest';
+              test['Pass'] = testResults.numFailedTests === 0;
+            } else {
+              // Mocha
+              test['Test Suite'] = 'Mocha';
+              test['Pass'] = testResults.stats.failures === 0;
+            }
             test['Results'] = JSON.stringify(testResults);
-            test['Pass'] = testResults.numFailedTests === 0;
             test['Student ID'] = [`${test['Student ID']}`];
             test['Run Time'] = runTime;
             threadCount--;
@@ -91,3 +101,5 @@ const runner = () => {
     console.log(error);
   }
 })();
+
+module.exports = { runTest };
