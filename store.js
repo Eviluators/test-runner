@@ -28,8 +28,8 @@ class State {
   constructor(state = {}) {
     this.queue = state.queue || new Queue();
     this.backupQueue = state.backupQueue || new Queue();
-    this.interval = state.interval || 3000;
-    this.maxThreadCount = state.maxThreadCount || 4;
+    this.interval = state.interval || 0;
+    this.maxThreadCount = state.maxThreadCount || 1;
     this.runTimeLog = state.runTimeLog || new Queue();
     this.backupRunTimeLog = state.backupRunTimeLog || new Queue();
     this.runTimeAvg = state.runTimeAvg || '';
