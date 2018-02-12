@@ -55,22 +55,15 @@ server.get('/start-tune', async (req, res) => {
 
 server.post('/new-test', async (req, res) => {
   try {
-    console.log('Is This Thing on??');
     if (checkGitHub(req)) {
-      console.log('Request from GitHub webhook verified.');
-      console.log(req.body.action === 'opened');
       if (req.body.action === 'opened') {
-        console.log('One');
         const { pull_request } = req.body;
-        console.log('two', pull_request.user.login);
         const student = await getStudent(pull_request.user.login);
-        console.log('three');
         const testSubmission = {
           'Student ID': student.id,
           'PR Url': pull_request.head.repo.html_url,
           'Repository Name': pull_request.head.repo.name
         };
-        console.log('*** TEST SUBMISSION ***', testSubmission);
         if (store.inTuneMode()) {
           store.addToBackupQueue(testSubmission);
         } else {

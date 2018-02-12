@@ -29,4 +29,4 @@ const actions = {
   }
 };
 
-module.exports = process.env.TEST !== 'test' ? actions : mockActions;
+module.exports = process.env.NODE_ENV !== 'test' ? actions : mockActions;
