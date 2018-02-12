@@ -10,6 +10,7 @@ chai.use(chaiAsPromised);
 
 const runner = require('./runner');
 
+
 const test =  {
   url: 'https://github.com/dys2/DYS2-hooks',
   _id: 999999999,
@@ -42,7 +43,6 @@ const deleteFolderRecursive = (path) => {
     fs.rmdirSync(path);
   }
 };
-
 
 describe('runTest', () => {
   describe('git', () => {
