@@ -11,6 +11,8 @@ require('./runner');
 server.use(cors());
 server.use(helmet());
 server.use(bodyParser.json());
+server.use(cors());
+server.use(helmet());
 
 // might be worth separating this into it's own file
 const checkGitHub = req => {
