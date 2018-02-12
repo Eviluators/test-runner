@@ -23,7 +23,7 @@ const checkGitHub = req => {
   }
   const theirSignature = req.headers['x-hub-signature'];
   const payload = JSON.stringify(req.body);
-  const secret = 'AKZoLGKhDfOZvKuV'; //process.env.GITHUB_SECRET_TOKEN ||
+  const secret = process.env.GITHUB_SECRET_TOKEN;
   const ourSignature = `sha1=${crypto
     .createHmac('sha1', secret)
     .update(payload)
@@ -46,7 +46,7 @@ server.get('/', (req, res) => {
 server.get('/start-tune', async (req, res) => {
   try {
     if (checkGitHub(req)) {
-      console.log("Request from GitHub webhook verified.")
+      console.log('Request from GitHub webhook verified.');
       const { auth } = req.body;
       if (auth === process.env.TUNER_AUTH) {
         startTuner();
