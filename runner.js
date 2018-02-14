@@ -57,6 +57,7 @@ const runTest = (test, cb) => {
             }
             test['Results'] = JSON.stringify(testResults);
             test['Student ID'] = [`${test['Student ID']}`];
+            test['Student Record ID'] = test['Student ID'];
             test['Run Time'] = runTime;
             threadCount--;
             console.log(`Test Finished in: ${runTime}ms`);
